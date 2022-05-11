@@ -1,4 +1,5 @@
 import networkx as nx
+import matplotlib.pyplot as plt
 
 from graph_editor.console.model.graph_errors import *
 
@@ -6,8 +7,10 @@ from graph_editor.console.model.graph_errors import *
 class ConsoleGraph:
     _path_to_save = './graph_editor/saved_graphs/'
     _type_edges = ['--', '<-', '->']
+    _DEFAULT_COLOR = 'blue'
     
     def __init__(self, *args, **kwargs):
+        self.color_map = []
         self.graph = nx.DiGraph()
         if kwargs.get('name'):
             self.graph.graph['name'] = kwargs['name']
@@ -72,6 +75,49 @@ class ConsoleGraph:
     
     def add_node(self, node_name, node_data):
         self.graph.add_node(node_name)
-        for d in node_data:
-            self.set_node_data(node=node_name, data=node_data)
+        self.set_node_data(node=node_name, data=node_data)
         return True
+    
+    def show_in_label(self):
+        self.update_color_map()
+        plt.figure(self.name)
+        nx.draw(self.graph, node_color=self.color_map, with_labels=True, font_weight='bold')
+        plt.show()
+        
+    def delete_node(self, node_name):
+        if node_name not in self.nodes:
+            return 
+        
+        self.graph.remove_node(node_name)
+        
+    def update_color_map(self):
+        self.color_map.clear()
+        for n in self.nodes:
+            if self.nodes[n].get('color'):
+                self.color_map.append(self.nodes[n]['color'])
+            else:
+                self.color_map.append(self._DEFAULT_COLOR)
+            
+    def set_node_color(self, node, color):
+        self.graph.nodes[node]['color'] = color
+        
+    def replace_node(self, node, to_graph):
+        print(node)
+        print(self.graph.nodes)
+        node_data = self.graph.nodes[node]
+        print(node_data)
+        self.delete_node(node)
+        
+        if node in to_graph.nodes:
+           return
+
+        to_graph.graph.add_nodes_from([
+            (node, node_data)
+        ])
+        
+    def get_node_info(self, node):
+        info = ""
+        info += f"Node {node}\n"
+        for k, v in self.graph.nodes[node].items():
+            info +=  f"{k} is {v}\n"
+        return info

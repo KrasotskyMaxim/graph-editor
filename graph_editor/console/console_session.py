@@ -14,47 +14,41 @@ class ConsoleSession:
         'show graphs': '4',
         'exit': '0'
     }
-    
     _graph_commands = {
         'node settings': '1',
         'edge settings': '2',
         'info': '3',
         'save': '4',
         'special functions': '5',
+        'show in label': '6',
         'exit': '0'
     }
-    
     _node_commands = {
         'add node': '1',
         'select node': '2',
         'show nodes': '3',
         'exit': '0'
     }
-    
     _single_node_commands = {
         'delete node': '1',
         'set node data': '2',
-        'set node type': '3',
-        'set node color': '4',
+        'set node color': '3',
+        'show node info': '4',
         'replace node': '5',
-        'show node info': '6',
         'exit': '0'
     }
-    
     _edge_commands = {
         'add edge': '1',
         'select edge': '2',
         'show edges': '3',
         'exit': '0'
     }
-    
     _single_edge_commands = {
         'delete edge': '1',
         'set edge color': '2',
         'show edge info': '3',
         'exit': '0'
     }
-    
     _special_fucntions_comamnds = {
         'to full graph': '1',
         'find eulerian cycle': '2',
@@ -63,14 +57,18 @@ class ConsoleSession:
         'exit': '0'
     }
     
+    
     def __init__(self, *args, **kwargs):
         self.graphs = []
         self.current_graph = None
+        self.current_edge = None
+        self.current_node = None 
         if kwargs.get('load'):
             self.load_graph(path=kwargs['load'])
         
     def start_main_session(self):
         self.show_start_menu()
+        
         
     def show_start_menu(self, warning=None):
         self.clear_console()
@@ -92,10 +90,11 @@ class ConsoleSession:
         print("GRAPH MENU")
         print("1 - Node settings")
         print("2 - Edge settings")
-        print("3 - info")
-        print("4 - save")
-        print("5 - special functions")
-        print("0 - exit")
+        print("3 - Info")
+        print("4 - Save")
+        print("5 - Special functions")
+        print("6 - Show in label")
+        print("0 - Exit")
         command = input("Enter: ")
         self.parse_graph_menu(command=command)
         
@@ -115,13 +114,12 @@ class ConsoleSession:
         self.clear_console()
         if warning:
             print(warning, end='\n\n')
-        print(f"NODE '{node_name}' MENU")
+        print(f"NODE '{self.current_node}' MENU")
         print("1 - Delete node")
         print("2 - Set node data")
-        print("3 - Set node type")
-        print("4 - Set node color")
-        print("5 - Show node info")
-        print("6 - Replace node")
+        print("3 - Set node color")
+        print("4 - Show node info")
+        print("5 - Replace node")
         print("0 - exit")
         command = input("Enter: ")
         self.parse_single_node_menu(command=command, node_name=node_name)
@@ -142,7 +140,7 @@ class ConsoleSession:
         self.clear_console()
         if warning:
             print(warning, end='\n\n')
-        print(f"EDGE FROM '{edge[0]}' TO '{edge[1]}' MENU")
+        print(f"EDGE FROM '{self.current_edge[0]}' TO '{self.current_edge[1]}' MENU")
         print("1 - Delete edge")
         print("2 - Set edge type")
         print("3 - Show edge info")
@@ -161,15 +159,7 @@ class ConsoleSession:
         print("0 - exit")
         command = input("Enter: ")
         self.parse_special_functions_menu(command=command)
-                 
-    def show_graph_info(self):
-        self.clear_console()
-        print(self.current_graph.info)
-        time.sleep(5)
-        self.show_graph_menu()
-    
-    def show_special_functions_menu(self):
-        print("special functions menu!")
+        
         
     def parse_start_menu(self, command):
         if command == self._start_commands['create graph']:
@@ -196,6 +186,8 @@ class ConsoleSession:
             self.save_graph()
         elif command == self._graph_commands['special functions']:
             self.show_special_functions_menu()
+        elif command == self._graph_commands['show in label']:
+            self.show_graph_in_label()
         elif command == self._graph_commands['exit']:
             self.end_graph_session()
         else:
@@ -215,17 +207,15 @@ class ConsoleSession:
             
     def parse_single_node_menu(self, command, node_name=None):
         if command == self._single_node_commands['delete node']:
-            self.delete_node()
+            self.delete_node(self.current_node)
         elif command == self._single_node_commands['set node data']:
             self.set_node_data()
-        elif command == self._single_node_commands['set node type']:
-            self.set_node_type()
         elif command == self._single_node_commands['set node color']:
             self.set_node_color()
         elif command == self._single_node_commands['replace node']:
-            self.replace_node()
+            self.replace_node(self.current_node)
         elif command == self._single_node_commands['show node info']:
-            self.show_node_info()
+            self.show_node_info(self.current_node)
         elif command == self._single_node_commands['exit']:
             self.end_single_node_session()
         else:
@@ -243,11 +233,32 @@ class ConsoleSession:
         else:
             self.show_edge_menu("Incorrect node command!")
     
-    def parse_single_edge_menu(self, command):
-        pass 
+    def parse_single_edge_menu(self, command, edge=None):
+        if command == self._single_edge_commands['delete edge']:
+            self.delete_edge()
+        elif command == self._single_edge_commands['set edge color']:
+            self.set_edge_color()
+        elif command == self._single_edge_commands['show edge info']:
+            self.show_edge_info()
+        elif command == self._single_edge_commands['exit']:
+            self.end_single_edge_session(edge=edge)
+        else:
+            self.show_single_edge_menu("Incorrect single edge command!", edge) 
     
     def parse_special_functions_menu(self, command):
-        pass 
+        if command == self._special_fucntions_comamnds['to full graph']:
+            self.to_full_graph()
+        elif command == self._special_fucntions_comamnds['find eulerian cycle']:
+            self.find_eulerian_cycle()
+        elif command == self._special_fucntions_comamnds['find all routes']:
+            self.find_all_routes()
+        elif command == self._special_fucntions_comamnds['find subgraph']:
+            self.find_subgraph()
+        elif command == self._single_edge_commands['exit']:
+            self.end_special_functions_session()
+        else:
+            self.show_special_functions__menu("Incorrect special functions command!")      
+            
             
     def create_graph(self):
         self.clear_console()
@@ -264,6 +275,12 @@ class ConsoleSession:
         self.graphs.append(graph)
         self.current_graph = graph
         self.show_graph_menu(warning="Graph create succesfully!")
+        
+    def show_graph_info(self):
+        self.clear_console()
+        print(self.current_graph.info)
+        time.sleep(5)
+        self.show_graph_menu()
 
     def show_graphs(self):
         self.clear_console()
@@ -274,6 +291,10 @@ class ConsoleSession:
                 print(f'{i+1}) {g.name}')
         time.sleep(5)
         self.show_start_menu()
+        
+    def show_graph_in_label(self):
+        self.current_graph.show_in_label()
+        self.show_graph_menu()
 
     def load_graph(self, path=None):
         if not path:
@@ -285,7 +306,8 @@ class ConsoleSession:
         if self.check_exists_graphs(graph_name=load_graph):
             self.graphs.append(graph)
             self.show_graph_menu("Graph load succesfully!")
-        self.show_start_menu(warning="This graph already exists!")
+        else:
+            self.show_start_menu(warning="This graph already exists!")
         
     def save_graph(self, path=None):
         if not path:
@@ -306,6 +328,16 @@ class ConsoleSession:
         if not flag:
             self.show_start_menu(warning="Doesn't have this graph name!")   
         self.show_graph_menu()
+        
+    def check_exists_graphs(self, graph_name=None):
+        if not graph_name:
+            return False
+        
+        for g in self.graphs:
+            if graph_name == g.name:
+                return False
+        return True
+            
             
     def add_node(self, node_name=None, node_data=None):
         if not node_name:
@@ -319,9 +351,6 @@ class ConsoleSession:
                 self.validate_node_data(d)
                 
         self.current_graph.add_node(node_name=node_name, node_data=node_data)
-        
-    def delete_node(self):
-        self.current_graph.delete_node()
         
     def validate_node_data(self, data):
         pattern = '^.+--.+$'
@@ -342,31 +371,55 @@ class ConsoleSession:
             self.validate_node_data(data)
             
         if self.current_graph.set_node_data(node=node, data=data):
-            self.show_node_menu(warning="Node data successful added!")
+            self.show_single_node_menu(warning="Node data successful added!")
             
     def select_node(self, node_name=None):
         if not node_name:
             node_name = input("node name: ")
             
+        self.current_node = node_name
         self.show_single_node_menu(node_name=node_name)
         
     def delete_node(self, node_name=None):
-        print("delete node!")
+        if not node_name:
+            node_name = input("node name: ")
         
-    def set_node_data(self, node_name=None, node_data=None):
-        print("set node data!")
-        
-    def set_node_type(self, node_name=None, node_type=None):
-        print("set node type!")
-    
+        for_delete = node_name
+        self.current_node = None 
+        self.current_graph.delete_node(for_delete)
+        self.show_node_menu(warning=f"Node {node_name} successful deleted!")
+            
     def set_node_color(self, node_name=None, node_color=None):
-        print("set node color!")
+        if not node_color:
+            node_color = input("node color: ")
+            
+        self.current_graph.set_node_color(node=self.current_node, color=node_color)
+        self.show_single_node_menu(warning="Node color successful changed!")
     
     def replace_node(self, node_name=None, to_graph=None):
-        print("replace node!")
+        if not to_graph:
+            flag = False
+            while not flag:
+                to_graph = input("to graph: ")
+                for g in self.graphs:
+                    if to_graph == g.name:
+                        to_graph = g
+                        flag = True
+                        break
+            
+        self.current_graph.replace_node(node_name, to_graph)
+        self.show_single_node_menu(warning=f"Node moved to {to_graph.name}")
     
     def show_node_info(self, node_name=None):
-        print("node info!")
+        if not node_name:
+            node_name = input("node name: ")
+            
+        info = self.current_graph.get_node_info(node_name)
+        self.clear_console()
+        print(info)
+        time.sleep(5)
+        self.show_single_node_menu()
+
             
     def add_edge(self, start=None, end=None):
         print("add edge!")
@@ -377,7 +430,31 @@ class ConsoleSession:
         if not end:
             end = input("end node: ")
             
+        self.current_edge = (start, end)
         self.show_single_edge_menu(edge=(start, end))
+        
+    def delete_edge(self):
+        print("delete edge")
+        
+    def set_edge_color(self):
+        print("set edge color")
+        
+    def show_edge_info(self):
+        print("show edge info")
+            
+            
+    def to_full_graph(self):
+        print("to full graph!")
+        
+    def find_eulerian_cycle(self):
+        print("find eulerian cycle!")
+        
+    def find_all_routes(self):
+        print("find all routes!")
+        
+    def find_subgraph(self):
+        print("find subgraph!")
+    
             
     def end_node_session(self):
         self.show_graph_menu()
@@ -395,15 +472,13 @@ class ConsoleSession:
     def end_single_node_session(self):
         self.show_node_menu()
         
+    def end_single_edge_session(self, edge):
+        self.show_edge_menu(edge)
+        
+    def end_special_functions_session(self):
+        self.show_graph_menu()
+        
     @staticmethod
     def clear_console():
         os.system("CLS")
         
-    def check_exists_graphs(self, graph_name=None):
-        if not graph_name:
-            return False
-        
-        for g in self.graphs:
-            if graph_name == g.name:
-                return False
-        return True
