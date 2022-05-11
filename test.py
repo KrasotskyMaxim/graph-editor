@@ -20,7 +20,7 @@ G1.add_edges_from([("B", "A", {'weight': 3.1415})])
 print("Nodes: ", list(G1.nodes))
 print("Edges: ", list(G1.edges(["A", 1])))
 print("Adj 'A': ", G1.adj["A"])
-print("Degree 1: ", G1.degree([1, 2]))
+print("Degree 1: ", G1.degree())
 
 G1.remove_node("B")
 G1.remove_nodes_from([5, 6, 7])
@@ -32,3 +32,6 @@ print(G1[2][3])
 
 print(G1.graph['graph_name'])
 print(G1.nodes.data())
+
+G1.nodes["A"]['data'] = 'hello'
+print('data: ', G1.nodes["A"]['data'])
