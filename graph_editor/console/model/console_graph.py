@@ -10,6 +10,7 @@ class ConsoleGraph:
     _DEFAULT_COLOR = 'blue'
     
     def __init__(self, *args, **kwargs):
+        self.is_full = False
         self.color_map = []
         self.graph = nx.DiGraph()
         if kwargs.get('name'):
@@ -56,6 +57,7 @@ class ConsoleGraph:
         nodes: {self.nodes}\n
         edges: {self.edges}\n
         nodes degree:\n{self.show_nodes_degree()}
+        is complete: {self.is_full}
         '''
     
     def show_nodes_degree(self):
@@ -140,4 +142,28 @@ class ConsoleGraph:
         for k, v in self.graph.edges[edge[0], edge[1]].items():
             info +=  f"{k} is {v}\n"
         return info
+    
+    def to_full_graph(self):
+        nodes = self.nodes
+        nodes_data = dict(self.graph.nodes.data())
+        full_graph = nx.complete_graph(nodes, nx.DiGraph())
+        
+        full_graph.graph['name'] = self.name
+        for n in full_graph.nodes:
+            if nodes_data[n]:
+                for key, value in nodes_data[n].items():
+                    full_graph.nodes[n][key] = value
+            
+        self.graph = full_graph
+        self.is_full = True
+        return True
+    
+    def find_eulerian_cycle(self):
+        try:
+            path = list(nx.eulerian_path(self.graph))
+            if path[0][0] == path[-1][1]:
+                return path
+            return False
+        except Exception as e:
+            return False
         

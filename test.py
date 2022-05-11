@@ -35,3 +35,18 @@ print(G1.nodes.data())
 
 G1.nodes["A"]['data'] = 'hello'
 print('data: ', G1.nodes["A"]['data'])
+
+GG = nx.DiGraph()
+
+GG.add_node(1)
+GG.add_node(2)
+GG.add_node(3)
+
+GG.add_edge(1, 1)
+GG.add_edge(2, 3)
+GG.add_edge(3, 2)
+
+res = list(nx.eulerian_path(GG))
+print(res)
+if res[0][0] == res[-1][1]:
+    print("Eyler cycle!")

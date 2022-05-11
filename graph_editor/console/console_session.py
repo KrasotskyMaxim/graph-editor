@@ -149,10 +149,12 @@ class ConsoleSession:
         command = input("Enter: ")
         self.parse_single_edge_menu(command=command, edge=edge)
              
-    def show_special_functions_menu(self, warning=None):
-        self.clear_console()
+    def show_special_functions_menu(self, warning=None, clear=True):
+        if clear:
+            self.clear_console()
         if warning:
             print(warning, end='\n\n')
+        print("SPECIAL FUNCTION MENU")
         print("1 - To full graph")
         print("2 - Find eulerian cycle")
         print("3 - Find all routes")
@@ -363,17 +365,11 @@ class ConsoleSession:
         return True
         
     def set_node_data(self, node=None, data=None):
-        if not node:
-            node = input("node name: ")
-            if node not in self.current_graph.nodes:
-                self.show_node_menu(warning="This node doesn't exists!")
-                return 
-        
         if not data:
             data = input("data key--data value: ") # name--Alex
             self.validate_node_data(data)
             
-        if self.current_graph.set_node_data(node=node, data=data):
+        if self.current_graph.set_node_data(node=self.current_node, data=data):
             self.show_single_node_menu(warning="Node data successful added!")
             
     def select_node(self, node_name=None):
@@ -469,11 +465,27 @@ class ConsoleSession:
         self.show_single_edge_menu()
             
     def to_full_graph(self):
-        print("to full graph!")
+        if self.current_graph.to_full_graph():
+            self.show_graph_menu(warning="Created complete graph!")
         
     def find_eulerian_cycle(self):
-        print("find eulerian cycle!")
+        path = self.current_graph.find_eulerian_cycle()
+        if path:
+            res = self.print_eulerian_cycle(path)
+            self.show_special_functions_menu(warning=res)
+        else:
+            self.show_special_functions_menu(warning="Graph doesn't have eylerian cycle!")
         
+    @staticmethod
+    def print_eulerian_cycle(path):
+        res = ""
+        res += "Cycle find!\n"
+        res += f"{path[0][0]} -> {path[0][1]} -> "
+        for i in range(1, len(path)):
+            res += f"{path[i][1]} -> "
+            
+        return res
+    
     def find_all_routes(self):
         print("find all routes!")
         
