@@ -25,10 +25,15 @@ class ConsoleGraph:
         for e in edges:
             for type_e in self._type_edges:
                 if type_e in e:
-                    edge = tuple(e.split(type_e))
+                    if type_e == '--':
+                        e1 = tuple(e.split(type_e))
+                        e2 = tuple(reversed(e1))
+                        edge = [e1, e2]
+                    else:   
+                        edge = [tuple(e.split(type_e))]
                     break
             if edge:
-                self.graph.add_edge(*edge)
+                self.graph.add_edges_from(edge)
             else:
                 raise EdgeError
             
@@ -69,8 +74,9 @@ class ConsoleGraph:
         return self.name
     
     def set_node_data(self, node, data):
-        data_key, data_value = tuple(data.split('--'))
-        self.graph.nodes[node][data_key] = data_value
+        if data:
+            data_key, data_value = tuple(data.split('--'))
+            self.graph.nodes[node][data_key] = data_value
         return True
     
     def add_node(self, node_name, node_data):
@@ -121,3 +127,17 @@ class ConsoleGraph:
         for k, v in self.graph.nodes[node].items():
             info +=  f"{k} is {v}\n"
         return info
+    
+    def delete_edge(self, edge):
+        self.graph.remove_edge(*edge)
+        
+    def set_edge_color(self, edge, color):
+        self.graph[edge[0]][edge[1]]['color'] = color
+        
+    def get_edge_info(self, edge):
+        info = ""
+        info += f"Edge {edge[0]}->{edge[1]}\n"
+        for k, v in self.graph.edges[edge[0], edge[1]].items():
+            info +=  f"{k} is {v}\n"
+        return info
+        

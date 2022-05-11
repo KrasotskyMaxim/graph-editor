@@ -1,3 +1,4 @@
+from distutils.log import warn
 import sys, os, time, re
 
 from graph_editor.console.model.console_graph import ConsoleGraph
@@ -105,7 +106,7 @@ class ConsoleSession:
         print("NODE MENU")
         print("1 - Create node")
         print("2 - Select node")                
-        print("4 - Show nodes")
+        print("3 - Show nodes")
         print("0 - exit")
         command = input("Enter: ")
         self.parse_node_menu(command=command)
@@ -142,7 +143,7 @@ class ConsoleSession:
             print(warning, end='\n\n')
         print(f"EDGE FROM '{self.current_edge[0]}' TO '{self.current_edge[1]}' MENU")
         print("1 - Delete edge")
-        print("2 - Set edge type")
+        print("2 - Set edge color")
         print("3 - Show edge info")
         print("0 - exit")
         command = input("Enter: ")
@@ -339,25 +340,27 @@ class ConsoleSession:
         return True
             
             
-    def add_node(self, node_name=None, node_data=None):
+    def add_node(self, node_name=None, data=None):
         if not node_name:
-            node_name = input("node name:")
+            node_name = input("node name: ")
             pass 
         
-        if not node_data:
+        if not data:
             data = input("data key--data value: ") # name--Alex
-            data = data.split()
+            # data = data.split()
             for d in data:
                 self.validate_node_data(d)
                 
-        self.current_graph.add_node(node_name=node_name, node_data=node_data)
+        self.current_graph.add_node(node_name=node_name, node_data=data)
+        self.show_node_menu(warning="Create new node!")
         
     def validate_node_data(self, data):
-        pattern = '^.+--.+$'
-        if not re.match(pattern, data):
-            self.show_node_menu(warning="Incorrect input data!")
-        else:
-            return True
+        # pattern = r'.+--.+'
+        # if not re.match(pattern, data):
+        #     self.show_node_menu(warning="Incorrect input data!")
+        # else:
+        #     return True
+        return True
         
     def set_node_data(self, node=None, data=None):
         if not node:
@@ -376,15 +379,12 @@ class ConsoleSession:
     def select_node(self, node_name=None):
         if not node_name:
             node_name = input("node name: ")
-            
+        
         self.current_node = node_name
-        self.show_single_node_menu(node_name=node_name)
+        self.show_single_node_menu(node_name=self.current_node)
         
     def delete_node(self, node_name=None):
-        if not node_name:
-            node_name = input("node name: ")
-        
-        for_delete = node_name
+        for_delete = self.current_node
         self.current_node = None 
         self.current_graph.delete_node(for_delete)
         self.show_node_menu(warning=f"Node {node_name} successful deleted!")
@@ -411,18 +411,35 @@ class ConsoleSession:
         self.show_single_node_menu(warning=f"Node moved to {to_graph.name}")
     
     def show_node_info(self, node_name=None):
-        if not node_name:
-            node_name = input("node name: ")
-            
-        info = self.current_graph.get_node_info(node_name)
+        info = self.current_graph.get_node_info(self.current_node)
         self.clear_console()
         print(info)
         time.sleep(5)
         self.show_single_node_menu()
 
             
-    def add_edge(self, start=None, end=None):
-        print("add edge!")
+    def show_nodes(self):
+        self.clear_console()
+        nodes = self.current_graph.nodes
+        for i, n in enumerate(nodes):
+            print(i+1, ') ', n)
+        time.sleep(5)
+        self.show_node_menu()
+    
+    def show_edges(self):
+        self.clear_console()
+        edges = self.current_graph.edges
+        for i, e in enumerate(edges):
+            print(f"{i+1}) from {e[0]} to {e[1]}")
+        time.sleep(5)
+        self.show_edge_menu()
+            
+    def add_edge(self, edge=None):
+        if not edge:
+            edge = input("edge: ")
+        
+        self.current_graph.parse_edges(edges=edge)
+        self.show_edge_menu(warning="Edge successful added!")
         
     def select_edge(self, start=None, end=None):
         if not start:
@@ -434,14 +451,22 @@ class ConsoleSession:
         self.show_single_edge_menu(edge=(start, end))
         
     def delete_edge(self):
-        print("delete edge")
+        self.current_graph.delete_edge(self.current_edge)
+        self.show_edge_menu(warning="Edge delete succesfully!")
         
-    def set_edge_color(self):
-        print("set edge color")
+    def set_edge_color(self, color=None):
+        if not color:
+            color = input("color: ")
+        
+        self.current_graph.set_edge_color(self.current_edge, color)
+        self.show_single_edge_menu(warning="Set color successful!")
         
     def show_edge_info(self):
-        print("show edge info")
-            
+        info = self.current_graph.get_edge_info(self.current_edge)
+        self.clear_console()
+        print(info)
+        time.sleep(5)
+        self.show_single_edge_menu()
             
     def to_full_graph(self):
         print("to full graph!")
