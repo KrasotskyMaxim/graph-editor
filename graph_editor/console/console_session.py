@@ -1,6 +1,8 @@
 from distutils.log import warn
 import sys, os, time, re
 
+from numpy import source
+
 from graph_editor.console.model.console_graph import ConsoleGraph
 
 
@@ -437,12 +439,11 @@ class ConsoleSession:
         self.current_graph.parse_edges(edges=edge)
         self.show_edge_menu(warning="Edge successful added!")
         
-    def select_edge(self, start=None, end=None):
-        if not start:
-            start = input("start node: ")
-        if not end:
-            end = input("end node: ")
-            
+    def select_edge(self, start_and_end=None):
+        if not start_and_end:
+            start_and_end = input("start and end: ")
+        start, end = tuple(start_and_end.split())
+        
         self.current_edge = (start, end)
         self.show_single_edge_menu(edge=(start, end))
         
@@ -486,11 +487,24 @@ class ConsoleSession:
             
         return res
     
-    def find_all_routes(self):
-        print("find all routes!")
+    def find_all_routes(self, source_and_target=None):
+        if not source_and_target:
+            source_and_target = input("source and target: ")
+        source, target = tuple(source_and_target.split())
         
-    def find_subgraph(self):
-        print("find subgraph!")
+        all_routes = self.current_graph.get_all_routes(source, target)
+        self.clear_console()
+        print("ALL ROUTES\n")
+        print(all_routes)
+        time.sleep(7)
+        self.show_special_functions_menu()
+        
+    def find_subgraph(self, nodes=None):
+        if not nodes:
+            nodes = input("nodes: ").split()    
+            
+        self.current_graph.show_subgraph(nodes)
+        self.show_special_functions_menu()
     
             
     def end_node_session(self):

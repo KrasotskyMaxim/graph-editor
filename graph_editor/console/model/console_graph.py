@@ -167,3 +167,26 @@ class ConsoleGraph:
         except Exception as e:
             return False
         
+    def get_all_routes(self, source, target):
+        res = "all paths:\n"
+        all_paths = nx.all_simple_paths(self.graph, source=source, target=target)
+        
+        for path in all_paths:    
+            res += str(path)
+        
+        try:
+            shortest_path = list(nx.shortest_path(self.graph, source=source, target=target))
+        except Exception as e:
+            return "\nNO routes!"
+        shortest_path_length = nx.shortest_path_length(self.graph, source=source, target=target)
+        res += f"\n\nshortest path: {shortest_path}\nand it's length is {shortest_path_length}"
+            
+        return res
+    
+    def show_subgraph(self, nodes):
+        subgraph = self.graph.subgraph(nodes)
+        
+        plt.figure(self.name+" subgraph")
+        nx.draw(subgraph, with_labels=True, font_weight='bold')
+        plt.show()
+        
