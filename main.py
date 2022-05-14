@@ -28,6 +28,6 @@ if __name__ == "__main__":
     settings = set_args(args)
     
     session = ConsoleSession(settings)
-    session.start_main_session()
+    session.start_session("start menu")
     
   

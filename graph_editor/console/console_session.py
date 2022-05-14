@@ -6,9 +6,6 @@ from numpy import source
 from graph_editor.console.model.console_graph import ConsoleGraph
 
 
-# TODO: - Является ли граф полным
-
-
 class ConsoleSession:
     _start_commands = {
         'create graph': '1',
@@ -69,8 +66,14 @@ class ConsoleSession:
         if kwargs.get('load'):
             self.load_graph(path=kwargs['load'])
         
-    def start_main_session(self):
-        self.show_start_menu()
+    def start_session(self, attr):
+        while True:
+            if attr == "start menu":
+                attr = self.show_start_menu()
+            elif attr == "graph menu":
+                attr = self.show_graph_menu()
+            elif attr == "create graph":
+                attr = self.create_graph()
         
         
     def show_start_menu(self, warning=None):
@@ -84,7 +87,7 @@ class ConsoleSession:
         print("4 - Show graphs")
         print("0 - Exit")
         command = input("Enter: ")
-        self.parse_start_menu(command=command)
+        return self.parse_start_menu(command=command)
         
     def show_graph_menu(self, warning=None):
         self.clear_console()
@@ -168,7 +171,8 @@ class ConsoleSession:
         
     def parse_start_menu(self, command):
         if command == self._start_commands['create graph']:
-            self.create_graph()
+            return "create graph"
+            # self.create_graph()
         elif command == self._start_commands['load graph']:
             self.load_graph()
         elif command == self._start_commands['select graph']:
@@ -279,7 +283,8 @@ class ConsoleSession:
         )
         self.graphs.append(graph)
         self.current_graph = graph
-        self.show_graph_menu(warning="Graph create succesfully!")
+        return "graph menu"
+        # self.show_graph_menu(warning="Graph create succesfully!")
         
     def show_graph_info(self):
         self.clear_console()
