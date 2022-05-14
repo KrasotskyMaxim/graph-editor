@@ -1,25 +1,21 @@
 graph [
   directed 1
-  name "Maxim"
+  name "Euler"
   node [
     id 0
-    label "A"
+    label "1"
   ]
   node [
     id 1
-    label "B"
+    label "2"
   ]
   node [
     id 2
-    label "C"
+    label "3"
   ]
   node [
     id 3
-    label "D"
-  ]
-  node [
-    id 4
-    label "E"
+    label "4"
   ]
   edge [
     source 0
@@ -27,18 +23,22 @@ graph [
   ]
   edge [
     source 0
-    target 3
+    target 2
   ]
   edge [
     source 1
     target 2
   ]
   edge [
-    source 3
-    target 4
+    source 2
+    target 3
   ]
   edge [
-    source 4
-    target 2
+    source 2
+    target 0
+  ]
+  edge [
+    source 3
+    target 0
   ]
 ]

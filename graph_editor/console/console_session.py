@@ -284,7 +284,8 @@ class ConsoleSession:
     def show_graph_info(self):
         self.clear_console()
         print(self.current_graph.info)
-        time.sleep(5)
+        ex = input()
+        
         self.show_graph_menu()
 
     def show_graphs(self):
@@ -294,7 +295,7 @@ class ConsoleSession:
         else:
             for i, g in enumerate(self.graphs):
                 print(f'{i+1}) {g.name}')
-        time.sleep(5)
+        ex = input()
         self.show_start_menu()
         
     def show_graph_in_label(self):
@@ -412,7 +413,7 @@ class ConsoleSession:
         info = self.current_graph.get_node_info(self.current_node)
         self.clear_console()
         print(info)
-        time.sleep(5)
+        ex = input()
         self.show_single_node_menu()
 
             
@@ -421,7 +422,7 @@ class ConsoleSession:
         nodes = self.current_graph.nodes
         for i, n in enumerate(nodes):
             print(i+1, ') ', n)
-        time.sleep(5)
+        ex = input()
         self.show_node_menu()
     
     def show_edges(self):
@@ -429,7 +430,7 @@ class ConsoleSession:
         edges = self.current_graph.edges
         for i, e in enumerate(edges):
             print(f"{i+1}) from {e[0]} to {e[1]}")
-        time.sleep(5)
+        ex = input()
         self.show_edge_menu()
             
     def add_edge(self, edge=None):
@@ -462,7 +463,7 @@ class ConsoleSession:
         info = self.current_graph.get_edge_info(self.current_edge)
         self.clear_console()
         print(info)
-        time.sleep(5)
+        ex = input()
         self.show_single_edge_menu()
             
     def to_full_graph(self):
@@ -496,7 +497,7 @@ class ConsoleSession:
         self.clear_console()
         print("ALL ROUTES\n")
         print(all_routes)
-        time.sleep(7)
+        ex = input()
         self.show_special_functions_menu()
         
     def find_subgraph(self, nodes=None):
