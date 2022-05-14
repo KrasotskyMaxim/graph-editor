@@ -1,7 +1,4 @@
-from distutils.log import warn
 import sys, os, time, re
-
-from numpy import source
 
 from graph_editor.console.model.console_graph import ConsoleGraph
 
